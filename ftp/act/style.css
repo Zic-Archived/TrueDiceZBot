@@ -1,0 +1,40 @@
+* {
+  //border: 1px solid #FFF;
+}
+
+body {
+  overflow-y:scr:;oll;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  padding: 0;
+  margin: 0;
+  /*background-color: #1E1E24;
+  color: #FFF;*/
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.navbar-collapse.collapse {
+  float: right;
+}
+
+.navbar-collapse.in {
+  float: none;
+}
+
+.no-border {
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
+.my-container {
+  margin-top: 80px;
+  padding: 25px;
+  width: 95%;
+  border: 2px solid #607D8B;
+}
+
+.invisible {
+  display: none;
+}
