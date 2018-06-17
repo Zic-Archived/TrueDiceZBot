@@ -1,12 +1,13 @@
 "uses strict";
 
-var VERSION_NAME = 'V1.3';
-var VERSION_CODE = 13;
+var VERSION_NAME = 'V1.4';
+var VERSION_CODE = 14;
 var INIT_BALANCE = 0;
 var TAKE_PROFIT_AMOUNT = 100;
 var STOP_LOSS_AMOUNT = 1000;
 var PROFIT_LOSS_AMOUNT = 0;
 
+var STRATEGY_CODE = 0; // Default strategy
 var INIT_BET_AMOUNT = 0.0001;
 //var INIT_PAYOUT = '2x';
 var FIRST_TIME_FLAG = true;
@@ -22,6 +23,11 @@ var CUR_AMOUNT = 0;
 // var WIN_COUNTER = 0;
 // var LOOSE_COUNTER = 0;
 
+// Stratey 1 when STRATEGY_CODE = 1 (424 Strategy)
+var s1LosesCounter = 0;
+var s1LosesLimit = 2;
+var s1Multiplier = 2;
+var s1Payout = '4x';
 
 init();
 
@@ -34,13 +40,24 @@ function init() {
     runAuto();
   });
 
-
   $("#input-group-addonc").off();
   $("#input-group-addonc").attr('title', 'Stop ZBot');
   $("#input-group-addonc").text('STOP');
   $("#input-group-addonc").click(function() {
     stopAuto();
     alert('Stop!');
+  });
+
+  $("#input-group-addonb").off();
+  $("#input-group-addonb").attr('title', 'Chien thuat 424 - Strategy 424');
+  $("#input-group-addonb").text('424');
+  $("#input-group-addonb").click(function() {
+    STRATEGY_CODE = 1;
+    $('#mfpayoutmul').val(s1Payout);
+    $('#mfpayoutmul').keyup();
+    alert('Da chon chien thuat 424');
+    AUTO_FLAG = true;
+    runAuto();
   });
 
   setupAuto();
@@ -55,7 +72,8 @@ function stopAuto() {
 
 function runAuto() {
   PROFIT_LOSS_AMOUNT = 0; // reset
-  $('#balancesx').attr('title', 'm.me/zickieloox');
+  $("#input-group-addona").off(); // Disable "Start"
+  $('#balancesx').attr('title', 'Tac gia: m.me/zickieloox');
 
   if (+$('#mfInputAmount').val() > 0) {
     INIT_BET_AMOUNT = +$('#mfInputAmount').val();
@@ -65,17 +83,19 @@ function runAuto() {
   //INIT_PAYOUT = $('#mfpayoutmul').val();
   INIT_BALANCE = +$('#balancesx').text();
 
-  MULTIPLYER = +prompt('Đặt multi = ', 2);
+  if(STRATEGY_CODE == 0) {
+    MULTIPLYER = +prompt('Đặt multi = ', 2);
+  }
+
   TAKE_PROFIT_AMOUNT = +prompt('Đặt take-profit ($) = ', 10);
   STOP_LOSS_AMOUNT = -prompt('Đặt stop-loss ($) = ', 100);
 
-  $("#input-group-addonb").off();
+  $("#input-group-addonb").off(); // Disable "424"
   $("#input-group-addonb").attr('title', 'Take-profit / Stop-loss');
   $("#input-group-addonb").text("> " + TAKE_PROFIT_AMOUNT +
     " / < " + STOP_LOSS_AMOUNT
   );
   $("#btnplaymb").click();
-  $("#input-group-addona").off();
 }
 
 function resetBetAmount() {
@@ -83,10 +103,10 @@ function resetBetAmount() {
   $('#mfInputAmount').val(INIT_BET_AMOUNT);
 }
 
-function multiplyBetAmount() {
+function multiplyBetAmount(multipler) {
   //var amount = $("#mfInputAmount").val();
   var mfpayoutmul = parseFloat($("#mfpayoutmul").val());
-  CUR_AMOUNT = CUR_AMOUNT * MULTIPLYER;
+  CUR_AMOUNT = CUR_AMOUNT * multipler;
   var mfProfitonWin = parseInt(CUR_AMOUNT * 10000 * mfpayoutmul - CUR_AMOUNT * 10000) / 10000;
   $("#mfInputAmount").val(CUR_AMOUNT.toFixed(4));
   $("#mfProfitonWin").val(mfProfitonWin.toFixed(4));
@@ -179,7 +199,7 @@ function setupAuto() {
             socket.emit('bet-event', data_socket);
           }
 
-
+          // Check active account
           if (FIRST_TIME_FLAG) {
             $.ajax({
                 async: false,
@@ -202,22 +222,36 @@ function setupAuto() {
             FIRST_TIME_FLAG = false;
           }
 
-          if (data.isWin > 0) {
-            // WIN_COUNTER++;
-            // NONSTOP_WIN_COUNTER++;
-            // if(NONSTOP_WIN_COUNTER > HIGHEST_WIN_COUNTER) {
-            //   HIGHEST_WIN_COUNTER = NONSTOP_WIN_COUNTER;
-            //   NONSTOP_WIN_COUNTER =0;
-            // }
-            resetBetAmount();
-          } else {
-            // LOOSE_COUNTER++;
-            // NONSTOP_LOSE_COUNTER++;
-            // if(NONSTOP_LOSE_COUNTER > HIGHEST_LOSE_COUNTER) {
-            //   HIGHEST_LOSE_COUNTER = NONSTOP_LOSE_COUNTER;
-            //   NONSTOP_LOSE_COUNTER =0;
-            // }
-            multiplyBetAmount();
+          // Bet based on custom strategy
+          if (STRATEGY_CODE == 0) {
+            if (data.isWin > 0) {
+              // WIN_COUNTER++;
+              // NONSTOP_WIN_COUNTER++;
+              // if(NONSTOP_WIN_COUNTER > HIGHEST_WIN_COUNTER) {
+              //   HIGHEST_WIN_COUNTER = NONSTOP_WIN_COUNTER;
+              //   NONSTOP_WIN_COUNTER =0;
+              // }
+              resetBetAmount();
+            } else {
+              // LOOSE_COUNTER++;
+              // NONSTOP_LOSE_COUNTER++;
+              // if(NONSTOP_LOSE_COUNTER > HIGHEST_LOSE_COUNTER) {
+              //   HIGHEST_LOSE_COUNTER = NONSTOP_LOSE_COUNTER;
+              //   NONSTOP_LOSE_COUNTER =0;
+              // }
+              multiplyBetAmount(MULTIPLYER);
+            }
+          } else if (STRATEGY_CODE == 1) {
+            if (data.isWin > 0) {
+              resetBetAmount();
+              s1LosesCounter = 0; // reset
+            } else {
+              s1LosesCounter++;
+              if (s1LosesCounter >= s1LosesLimit) {
+                multiplyBetAmount(s1Multiplier);
+                s1LosesCounter = 0; // reset
+              }
+            }
           }
 
           var curBalance = data.total_thisUser_profit;

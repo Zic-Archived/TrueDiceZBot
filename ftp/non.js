@@ -33,7 +33,7 @@
 
   setTimeout(function() {
     if (flag) {
-      alert('Phiên bản hiện tại đã lỗi thời! Vui lòng liên hệ tác giả: m.me/zickieloox để cập nhật lên phiên bản mới nhất');
+      alert('Phiên bản hiện tại đã lỗi thời! Vui lòng liên hệ tác giả để cập nhật lên phiên bản mới nhất');
     }
-  }, 8000);
+  }, 12000);
 })();
