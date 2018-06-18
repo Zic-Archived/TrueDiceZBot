@@ -103,10 +103,10 @@ function resetBetAmount() {
   $('#mfInputAmount').val(INIT_BET_AMOUNT);
 }
 
-function multiplyBetAmount(multipler) {
+function multiplyBetAmount(multiplyer) {
   //var amount = $("#mfInputAmount").val();
   var mfpayoutmul = parseFloat($("#mfpayoutmul").val());
-  CUR_AMOUNT = CUR_AMOUNT * multipler;
+  CUR_AMOUNT = CUR_AMOUNT * multiplyer;
   var mfProfitonWin = parseInt(CUR_AMOUNT * 10000 * mfpayoutmul - CUR_AMOUNT * 10000) / 10000;
   $("#mfInputAmount").val(CUR_AMOUNT.toFixed(4));
   $("#mfProfitonWin").val(mfProfitonWin.toFixed(4));

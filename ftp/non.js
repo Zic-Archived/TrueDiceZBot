@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TrueDice ZBot
 // @namespace    https://www.facebook.com/zickieloox
-// @version      1.1
+// @version      1.5
 // @description  An auto bot for truedice.io
 // @author       @zickieloox - fb.com/zickieloox
 // @homepage     https://m.me/zickieloox
@@ -15,25 +15,17 @@
 // ==/UserScript==
 
 (function() {
-  jQuery.loadScript = function(url, callback) {
-    jQuery.ajax({
-      url: url,
-      dataType: 'script',
-      success: callback,
-      async: false
-    });
-  };
 
-  var flag = true;
-  $.loadScript('https://vnzic.com/truedice/truedicezbotv1.js?v=' + Date.now(), function() {
+  $.ajax({
+    url: 'https://vnzic.com/truedice/truedicezbotv1.js?v=' + Date.now(),
+    dataType: 'script',
+    async: false
+  }).done(function(data) {
     console.log('Guns are loaded!');
-    flag = false;
     return;
+  }).fail(function() {
+      alert('Phiên bản hiện tại đã lỗi thời! Vui lòng liên hệ tác giả để cập nhật lên phiên bản mới nhất');
+      location.reload();
   });
 
-  setTimeout(function() {
-    if (flag) {
-      alert('Phiên bản hiện tại đã lỗi thời! Vui lòng liên hệ tác giả để cập nhật lên phiên bản mới nhất');
-    }
-  }, 12000);
 })();
