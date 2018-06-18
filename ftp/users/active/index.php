@@ -42,11 +42,12 @@ function activatedNewUser($conn, $accountId) {
   $adminId = 195;
 
   if (isset($_GET['note'])) {
-    $note = utf8_encode($_GET['note']);
+    //$note = utf8_encode($_GET['note']);
+    $note = $_GET['note'];
   }
 
   if (isset($_GET['fbAddr'])) {
-    $fbAddr = utf8_encode($_GET['fbAddr']);
+    $fbAddr = $_GET['fbAddr'];
   }
 
   if (isset($_GET['active'])) {

@@ -26,7 +26,7 @@ function showAllUsersInfo($conn) {
         $userObj->active = true ? $row['active'] == '1' : false;
         $userObj->note = $row['note'];
         $userObj->fbAddr = $row['fb_addr'];
-        $userObj->lastModified = $row['last_modified_date'];
+        $userObj->lastModified = date('d/m/Y H:i:s', $row['last_modified_date']);
 
         $userListRespArr[] = $userObj;
     }
